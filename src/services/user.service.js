@@ -1,4 +1,4 @@
-//serviço de dados
+//serviço de consumo de dados da api
 import axios from 'axios';
 import authHeader from './auth-header';
 const API_URL = 'http://186.237.58.167:65129/api/user/';
@@ -28,6 +28,10 @@ class UserService {
       },
       {headers: authHeader()},
       );
+  }
+    userEdit(usuario){
+      return axios.get(API_URL + 'getuserbyid/G/'+usuario.id,
+      { headers: authHeader() });
   }
 }
 export default new UserService();

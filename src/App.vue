@@ -2,7 +2,7 @@
   <div id="app">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <a href="/" class="navbar-brand">Desafio Fron-End</a>
-      <div class="navbar-nav mr-auto">
+      <div v-if="currentUser" class="navbar-nav mr-auto">
         <li class="nav-item">
           <router-link to="/user" class="nav-link">
             <font-awesome-icon icon="home" /> Home

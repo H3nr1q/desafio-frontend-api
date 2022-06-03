@@ -57,7 +57,8 @@
     <button @click="salvar()" class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
     <button @click="limpar()" class="waves-effect red btn-small">Cancelar<i class="material-icons left">cancel</i></button>
     <br><br>
-    <div class="card card-container">
+    <div class="card card-container" style="max-height: 400px;overflow-y: scroll;">
+      <input type="text" v-model="search" class="form-control" />
       <table>
         <thead>
           <tr>
@@ -73,9 +74,9 @@
             <td class="center">{{users.id}}</td>
             <td>{{users.name}}</td>
             <td>{{users.email}}</td>
-            <td>Ativo</td>
+            <td>Habilitado</td>
             <td>
-              <button class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
+              <button @click="editar(users)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
             </td>
           </tr>
         </tbody> 
@@ -95,8 +96,21 @@ export default {
   mounted(){
     UnitList.unitList().then(resposta =>{
       this.listUnit = resposta.data.productionUnitList
+    }).catch(e => {
+          this.errors = e.resposta.data.errors
     }),
     this.listarUsuarios()
+  },
+  computed: {
+    resultQuery(){
+      if(this.searchQuery){
+      return this.users.filter((users)=>{
+        return this.searchQuery.toLowerCase().split(' ').every(v => users.name.toLowerCase().includes(v))
+      })
+      }else{
+        return this.users;
+      }
+    }
   },
   components: { 
     Toggle,
@@ -123,23 +137,42 @@ export default {
     value2: false,
     value3: false,
     errors: [],
+    sortKey: '',
+    search: '',
+    reverse: false,
+    columns: [],
   }),
 
   methods:{
     listarUsuarios(){
       UnitList.userList().then(resposta => {
       this.listUsers = resposta.data
+    }).catch(e => {
+          this.errors = e.resposta.data.errors
     })
     },
     async salvar(){
-      this.checkForm();
-      this.form.UserPassword = (Base64.encode(md5(this.form.UserPassword)));
-      await UnitList.salvar(this.form).then(resposta =>{
-        alert('Usuário salvo com sucesso')
+      if(this.form.id == 0){
+        this.checkForm();
+        this.form.UserPassword = (Base64.encode(md5(this.form.UserPassword)));
+        await UnitList.salvar(this.form).then(resposta =>{
+        alert('Usuário salvo com sucesso.')
         this.listarUsuarios()
         this.limpar()
+        }).catch(e => {
+          this.errors = e.response.data.errors
         })
-          
+      }else{
+        this.checkForm();
+        this.form.UserPassword = (Base64.encode(md5(this.form.UserPassword)));
+        await UnitList.salvar(this.form).then(resposta =>{
+        alert('Usuário alterado com sucesso.')
+        this.listarUsuarios()
+        this.limpar()
+        }).catch(e => {
+          this.errors = e.response.data.errors
+        })
+      }          
     },
     limpar(){
       this.form = {}
@@ -174,7 +207,15 @@ export default {
      validEmail: function (email) {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
-    }
+    },
+    editar(users){
+      this.users = UnitList.userEdit(users).then(resposta =>{
+        this.form = resposta.data
+        }).catch(e => {
+          this.errors = e.resposta.data.errors
+        })
+    },
+    
   }
 }
 </script>

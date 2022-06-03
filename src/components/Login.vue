@@ -1,6 +1,6 @@
 <template>  
-  <div class="col-md-12">
-    <div class="card card-container">
+  <div class="login-page">
+    <div class="card card-header" align>
       <br>
       <center>
         <img src="../assets/logo.png" width="300" /> 
