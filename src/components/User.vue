@@ -2,7 +2,7 @@
   <div class="user">
     <h1 class="title">Gestão de Usuários</h1>
       <div class="card card-container">
-      <form @submit="salvar">
+      <form @submit="salvar" action="https://vuejs.org/" method="post" novalidate="true">
         <div class="form">
           <div class="col-md-5">
             <div class="form-group">
@@ -31,24 +31,29 @@
             </div>
             <div class="form-group">
               <label for="UserPasswordConfirmed">Confirmação da Senha:</label>
-              <input for="UserPasswordConfirmed" type="password" class="form-control" placeholder="Informe a senha do usuário">
+              <input for="UserPasswordConfirmed" v-model="form.UserPasswordConfirmed" type="password" class="form-control" placeholder="Confirme a senha do usuário">
             </div>
           </div>          
         </div>
         <div class="center">
             <table>
               <label>Tempo de Token:</label>
-              <input type="number" value="0" class="col-md-4" style="text-align:center;">
+              <input type="number" value="0" class="col-md-4" style="text-align:center;" min="0">
               <td><Toggle v-model="value1"/> Receber Alertas?</td>
               <td><Toggle v-model="value2"/> Tratar Ocorrências?</td>
               <td><Toggle v-model="value3"/> Desabilitar usuário?</td>
             </table>
         </div>
         <br>
-        
-        <br>
+         <br>
       </form> 
     </div>
+    <p v-if="errors.length">
+    <font color="#ff0000"><b>Por favor, corrija o(s) seguinte(s) erro(s):</b></font>
+    <ul>
+      <li v-for="error in errors" :key="error"><font color="#ff0000">{{ errors }}</font></li>
+    </ul>
+    </p>
     <button @click="salvar()" class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
     <button @click="limpar()" class="waves-effect red btn-small">Cancelar<i class="material-icons left">cancel</i></button>
     <br><br>
@@ -109,13 +114,15 @@ export default {
       loginExpiration: 4,
       disabled: false,
       system: 'G',
-      unitId: ''
+      unitId: '',
+      UserPasswordConfirmed: ''
     },
     listUnit: [],
     listUsers: [],
     value1: false,
     value2: false,
-    value3: false
+    value3: false,
+    errors: [],
   }),
 
   methods:{
@@ -125,15 +132,48 @@ export default {
     })
     },
     async salvar(){
+      this.checkForm();
       this.form.UserPassword = (Base64.encode(md5(this.form.UserPassword)));
       await UnitList.salvar(this.form).then(resposta =>{
         alert('Usuário salvo com sucesso')
         this.listarUsuarios()
         this.limpar()
-      })
+        })
+          
     },
     limpar(){
       this.form = {}
+    },
+    checkForm: function(e) {
+      this.errors = [];
+      if(!this.form.userName){
+        this.errors.push('O login é obrigatório.');
+      }
+      if(!this.form.name){
+        this.errors.push('Nome é obrigatório.');
+      }
+      if(!this.form.UserPassword){
+        this.errors.push('Senha é obrigatório.');
+      }
+      if(!this.form.email){
+        this.errors.push('E-mail é obrigatório.');
+      }
+      else if (!this.validEmail(this.form.email)) {
+        this.errors.push('Utilize um e-mail válido.');
+      }
+      if(!this.form.UserPasswordConfirmed){
+        this.errors.push('Confirmar senha é obrigatório');
+      }else if (this.form.UserPasswordConfirmed != this.form.UserPassword){
+        this.errors.push('Senhas não identicas');
+      }
+      if(!this.errors.length){
+        return true;
+      }
+      e.preventDefault();   
+    },
+     validEmail: function (email) {
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     }
   }
 }
