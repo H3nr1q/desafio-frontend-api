@@ -38,7 +38,7 @@
         <div class="center">
             <table>
               <label>Tempo de Token:</label>
-              <input type="number" value="0" class="col-md-4" style="text-align:center;" min="0">
+              <input type="number" v-model="token" class="col-md-4" style="text-align:center;" min="0">
               <td><Toggle v-model="value1"/> Receber Alertas?</td>
               <td><Toggle v-model="value2"/> Tratar Ocorrências?</td>
               <td><Toggle v-model="value3"/> Desabilitar usuário?</td>
@@ -58,7 +58,6 @@
     <button @click="limpar()" class="waves-effect red btn-small">Cancelar<i class="material-icons left">cancel</i></button>
     <br><br>
     <div class="card card-container" style="max-height: 400px;overflow-y: scroll;">
-      <input type="text" v-model="search" class="form-control" />
       <table>
         <thead>
           <tr>
@@ -102,15 +101,7 @@ export default {
     this.listarUsuarios()
   },
   computed: {
-    resultQuery(){
-      if(this.searchQuery){
-      return this.users.filter((users)=>{
-        return this.searchQuery.toLowerCase().split(' ').every(v => users.name.toLowerCase().includes(v))
-      })
-      }else{
-        return this.users;
-      }
-    }
+    
   },
   components: { 
     Toggle,
@@ -137,10 +128,8 @@ export default {
     value2: false,
     value3: false,
     errors: [],
-    sortKey: '',
-    search: '',
-    reverse: false,
-    columns: [],
+    token: 0,
+
   }),
 
   methods:{
@@ -175,7 +164,11 @@ export default {
       }          
     },
     limpar(){
-      this.form = {}
+      this.form = {},
+      this.value1 = false,
+      this.value2 = false,
+      this.value3 = false,
+      this.token = 0
     },
     checkForm: function(e) {
       this.errors = [];
