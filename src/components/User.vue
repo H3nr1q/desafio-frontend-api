@@ -166,11 +166,14 @@ export default {
       }          
     },
     limpar(){
-      this.form = {},
-      this.value1 = false,
-      this.value2 = false,
-      this.value3 = false,
-      this.token = 0
+      if(confirm("Deseja limpar os campos do formulário?") == true){
+        this.form = {},
+        this.value1 = false,
+        this.value2 = false,
+        this.value3 = false,
+        this.token = 0
+      }
+      
     },
     checkForm: function(e) {
       this.errors = [];
