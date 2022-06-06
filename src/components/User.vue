@@ -73,7 +73,9 @@
             <td class="center">{{users.id}}</td>
             <td>{{users.name}}</td>
             <td>{{users.email}}</td>
-            <td>Habilitado</td>
+            <td v-if="users.disabled === false">Habilitado</td>
+            <td v-else>Desabilitado</td>
+            
             <td>
               <button @click="editar(users)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
             </td>
